@@ -1,6 +1,8 @@
 -- Run this SQL in the Supabase SQL Editor to set up the database schema.
 
-CREATE TABLE IF NOT EXISTS payments (
+DROP TABLE IF EXISTS payments CASCADE;
+
+CREATE TABLE payments (
   id            TEXT PRIMARY KEY,
   customer_name TEXT NOT NULL,
   customer_email TEXT,
@@ -15,7 +17,7 @@ CREATE TABLE IF NOT EXISTS payments (
 );
 
 -- Index for fast status-based queries (used by the admin panel)
-CREATE INDEX IF NOT EXISTS payments_status_idx ON payments (status, inserted_at DESC);
+CREATE INDEX payments_status_idx ON payments (status, inserted_at DESC);
 
 -- Disable Row Level Security since all access goes through
 -- Vercel serverless functions using the service role key.

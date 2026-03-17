@@ -1,8 +1,20 @@
 export async function sendInvoiceEmail(customerEmail, customerName, orderId, items, total, orderDate) {
-  if (!customerEmail || !process.env.RESEND_API_KEY) {
-    console.warn('Email skipped: missing email or RESEND_API_KEY');
-    return { success: false, message: 'Email service not configured' };
+  console.log('sendInvoiceEmail called with:', { customerEmail, customerName, orderId });
+  
+  if (!customerEmail) {
+    console.warn('Email skipped: no customer email provided');
+    return { success: false, message: 'No email provided' };
   }
+
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('Email skipped: RESEND_API_KEY not configured');
+    return { success: false, message: 'Email service not configured - RESEND_API_KEY missing' };
+  }
+
+  const apiKey = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@drinksnsweets.com';
+  
+  console.log('Sending email with API key length:', apiKey?.length, 'from:', fromEmail);
 
   const itemsHtml = items
     .map(
@@ -97,14 +109,14 @@ export async function sendInvoiceEmail(customerEmail, customerName, orderId, ite
     if (!response.ok) {
       const error = await response.json();
       console.error('Resend API error:', error);
-      return { success: false, message: 'Failed to send email' };
+      return { success: false, message: `Failed to send email: ${error.message || response.statusText}` };
     }
 
     const result = await response.json();
-    console.log('Email sent:', result.id);
+    console.log('Email sent successfully:', result.id);
     return { success: true, messageId: result.id };
   } catch (error) {
-    console.error('Email service error:', error);
-    return { success: false, message: error.message };
+    console.error('Email service error:', error.message, error.stack);
+    return { success: false, message: `Email error: ${error.message}` };
   }
 }

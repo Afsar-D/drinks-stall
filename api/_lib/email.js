@@ -1,20 +1,15 @@
 export async function sendInvoiceEmail(customerEmail, customerName, orderId, items, total, orderDate) {
-  console.log('sendInvoiceEmail called with:', { customerEmail, customerName, orderId });
-  
   if (!customerEmail) {
-    console.warn('Email skipped: no customer email provided');
     return { success: false, message: 'No email provided' };
   }
 
   if (!process.env.RESEND_API_KEY) {
-    console.warn('Email skipped: RESEND_API_KEY not configured');
-    return { success: false, message: 'Email service not configured - RESEND_API_KEY missing' };
+    return { success: false, message: 'RESEND_API_KEY missing' };
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@drinksnsweets.com';
-  
-  console.log('Sending email with API key length:', apiKey?.length, 'from:', fromEmail);
+  if (!process.env.RESEND_FROM_EMAIL) {
+    return { success: false, message: 'RESEND_FROM_EMAIL missing' };
+  }
 
   const itemsHtml = items
     .map(
@@ -99,7 +94,7 @@ export async function sendInvoiceEmail(customerEmail, customerName, orderId, ite
         Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: process.env.RESEND_FROM_EMAIL || 'noreply@drinksnsweets.com',
+        from: process.env.RESEND_FROM_EMAIL,
         to: customerEmail,
         subject: `Invoice ${orderId} - Approved`,
         html: htmlContent,
@@ -113,10 +108,9 @@ export async function sendInvoiceEmail(customerEmail, customerName, orderId, ite
     }
 
     const result = await response.json();
-    console.log('Email sent successfully:', result.id);
     return { success: true, messageId: result.id };
   } catch (error) {
-    console.error('Email service error:', error.message, error.stack);
-    return { success: false, message: `Email error: ${error.message}` };
+    console.error('Email service error:', error);
+    return { success: false, message: `Email error: ${error?.message || 'unknown error'}` };
   }
 }

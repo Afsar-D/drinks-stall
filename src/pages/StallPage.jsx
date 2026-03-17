@@ -101,6 +101,7 @@ export default function StallPage() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState('cart');
   const [customerName, setCustomerName] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
   const [nameError, setNameError] = useState(false);
   const [showPayConfirm, setShowPayConfirm] = useState(false);
   const [requestError, setRequestError] = useState('');
@@ -158,6 +159,7 @@ export default function StallPage() {
       if (checkoutStep === 'success' || checkoutStep === 'cancelled') {
         setCart([]);
         setCustomerName('');
+        setCustomerEmail('');
         setSubmittedOrder(null);
         setCurrentRequestId('');
         setOrderId('');
@@ -193,6 +195,7 @@ export default function StallPage() {
 
     const snapshot = {
       customerName: customerName.trim(),
+      customerEmail: customerEmail.trim(),
       items: cart.map((item) => ({ ...item })),
       total: cartTotal
     };
@@ -200,6 +203,7 @@ export default function StallPage() {
     try {
       const result = await requestPayment({
         customerName: snapshot.customerName,
+        customerEmail: snapshot.customerEmail,
         items: toSerializableItems(snapshot.items),
         total: snapshot.total
       });
@@ -590,6 +594,23 @@ export default function StallPage() {
                             }`}
                           />
                           {nameError && <p className="text-red-500 text-xs mt-1 font-medium">Please enter your name to proceed.</p>}
+                        </div>
+
+                        <div>
+                          <label htmlFor="customerEmail" className="block text-sm font-bold text-gray-700 mb-1">
+                            Email (to receive invoice) <span className="text-gray-400 text-xs font-normal">(optional)</span>
+                          </label>
+                          <input
+                            type="email"
+                            id="customerEmail"
+                            value={customerEmail}
+                            onChange={(event) => {
+                              setCustomerEmail(event.target.value);
+                            }}
+                            placeholder="your@email.com"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white shadow-sm focus:ring-2 focus:ring-orange-500 focus:outline-none transition-colors"
+                          />
+                          <p className="text-gray-500 text-xs mt-1">We'll send your invoice here when your order is approved.</p>
                         </div>
 
                         <div className="flex justify-between text-lg font-bold text-gray-900 mt-2">

@@ -1,5 +1,6 @@
 import supabase from '../../../_lib/supabase.js';
 import { toResponseRow, requireAdmin } from '../../../_lib/helpers.js';
+import { sendInvoiceEmail } from '../../../_lib/email.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -50,6 +51,19 @@ export default async function handler(req, res) {
   if (updateError) {
     console.error(updateError);
     return res.status(500).json({ message: 'Failed to approve payment' });
+  }
+
+  // Send invoice email if customer email exists
+  if (updated.customer_email) {
+    const items = JSON.parse(updated.items_json);
+    await sendInvoiceEmail(
+      updated.customer_email,
+      updated.customer_name,
+      orderId,
+      items,
+      updated.total,
+      orderDate
+    );
   }
 
   return res.json(toResponseRow(updated));

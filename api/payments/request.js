@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { customerName, items, total } = req.body;
+  const { customerName, customerEmail, items, total } = req.body;
   if (!customerName || !Array.isArray(items) || items.length === 0 || typeof total !== 'number') {
     return res.status(400).json({ message: 'Invalid payment request payload' });
   }
@@ -19,6 +19,7 @@ export default async function handler(req, res) {
   const { error } = await supabase.from('payments').insert({
     id,
     customer_name: customerName.trim(),
+    customer_email: customerEmail?.trim() || null,
     items_json: JSON.stringify(items),
     total,
     created_at: createdAt,

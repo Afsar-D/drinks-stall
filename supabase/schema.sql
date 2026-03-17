@@ -3,6 +3,7 @@
 CREATE TABLE IF NOT EXISTS payments (
   id            TEXT PRIMARY KEY,
   customer_name TEXT NOT NULL,
+  customer_email TEXT,
   items_json    TEXT NOT NULL,
   total         REAL NOT NULL,
   created_at    TEXT NOT NULL,

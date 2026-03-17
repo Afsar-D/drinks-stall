@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS payments CASCADE;
 CREATE TABLE payments (
   id            TEXT PRIMARY KEY,
   customer_name TEXT NOT NULL,
-  customer_email TEXT,
+  customer_email TEXT NOT NULL,
   items_json    TEXT NOT NULL,
   total         REAL NOT NULL,
   created_at    TEXT NOT NULL,

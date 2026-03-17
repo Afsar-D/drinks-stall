@@ -103,6 +103,7 @@ export default function StallPage() {
   const [customerName, setCustomerName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
   const [nameError, setNameError] = useState(false);
+  const [emailError, setEmailError] = useState('');
   const [showPayConfirm, setShowPayConfirm] = useState(false);
   const [requestError, setRequestError] = useState('');
   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
@@ -115,6 +116,7 @@ export default function StallPage() {
   const [trackerError, setTrackerError] = useState('');
   const [trackerLoading, setTrackerLoading] = useState(false);
   const [trackedPayment, setTrackedPayment] = useState(null);
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
   const cartItemCount = cart.reduce((count, item) => count + item.quantity, 0);
@@ -173,20 +175,37 @@ export default function StallPage() {
       }
       setCheckoutStep('cart');
       setNameError(false);
+      setEmailError('');
       setRequestError('');
     }, 250);
   };
 
   const handlePlaceOrder = () => {
+    const trimmedEmail = customerEmail.trim();
+
     if (!customerName.trim()) {
       setNameError(true);
       return;
     }
+
+    if (!trimmedEmail) {
+      setEmailError('Please enter your email to proceed.');
+      return;
+    }
+
+    if (!emailRegex.test(trimmedEmail)) {
+      setEmailError('Please enter a valid email address.');
+      return;
+    }
+
+    setEmailError('');
     setCheckoutStep('payment');
   };
 
   const handleSendPaymentForApproval = async () => {
-    if (!customerName.trim() || cart.length === 0) {
+    const trimmedEmail = customerEmail.trim();
+
+    if (!customerName.trim() || !trimmedEmail || !emailRegex.test(trimmedEmail) || cart.length === 0) {
       return;
     }
 
@@ -195,7 +214,7 @@ export default function StallPage() {
 
     const snapshot = {
       customerName: customerName.trim(),
-      customerEmail: customerEmail.trim(),
+      customerEmail: trimmedEmail,
       items: cart.map((item) => ({ ...item })),
       total: cartTotal
     };
@@ -598,7 +617,7 @@ export default function StallPage() {
 
                         <div>
                           <label htmlFor="customerEmail" className="block text-sm font-bold text-gray-700 mb-1">
-                            Email (to receive invoice) <span className="text-gray-400 text-xs font-normal">(optional)</span>
+                            Email (to receive invoice) <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="email"
@@ -606,11 +625,18 @@ export default function StallPage() {
                             value={customerEmail}
                             onChange={(event) => {
                               setCustomerEmail(event.target.value);
+                              setEmailError('');
                             }}
                             placeholder="your@email.com"
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white shadow-sm focus:ring-2 focus:ring-orange-500 focus:outline-none transition-colors"
+                            className={`w-full px-4 py-3 rounded-xl border bg-white shadow-sm focus:ring-2 focus:ring-orange-500 focus:outline-none transition-colors ${
+                              emailError ? 'border-red-500 focus:ring-red-500' : 'border-gray-200'
+                            }`}
                           />
-                          <p className="text-gray-500 text-xs mt-1">We'll send your invoice here when your order is approved.</p>
+                          {emailError ? (
+                            <p className="text-red-500 text-xs mt-1 font-medium">{emailError}</p>
+                          ) : (
+                            <p className="text-gray-500 text-xs mt-1">We'll send your invoice here when your order is approved.</p>
+                          )}
                         </div>
 
                         <div className="flex justify-between text-lg font-bold text-gray-900 mt-2">

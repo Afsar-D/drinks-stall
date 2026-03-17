@@ -6,7 +6,17 @@ export default async function handler(req, res) {
   }
 
   const { customerName, customerEmail, items, total } = req.body;
-  if (!customerName || !Array.isArray(items) || items.length === 0 || typeof total !== 'number') {
+  const normalizedEmail = typeof customerEmail === 'string' ? customerEmail.trim() : '';
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (
+    !customerName ||
+    !normalizedEmail ||
+    !emailRegex.test(normalizedEmail) ||
+    !Array.isArray(items) ||
+    items.length === 0 ||
+    typeof total !== 'number'
+  ) {
     return res.status(400).json({ message: 'Invalid payment request payload' });
   }
 
@@ -19,7 +29,7 @@ export default async function handler(req, res) {
   const { error } = await supabase.from('payments').insert({
     id,
     customer_name: customerName.trim(),
-    customer_email: customerEmail?.trim() || null,
+    customer_email: normalizedEmail,
     items_json: JSON.stringify(items),
     total,
     created_at: createdAt,

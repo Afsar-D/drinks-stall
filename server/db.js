@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const dbPath = process.env.DB_PATH || path.join(__dirname, 'stall.db');
+const dbPath = path.join(__dirname, 'stall.db');
 fs.mkdirSync(path.dirname(dbPath), { recursive: true });
 const db = new Database(dbPath);
 
@@ -22,8 +22,33 @@ db.exec(`
     status TEXT NOT NULL,
     order_id TEXT,
     order_date TEXT,
-    approved_at TEXT
+    approved_at TEXT,
+    cancel_reason TEXT,
+    cancelled_at TEXT
   );
 `);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS payment_audit_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    payment_id TEXT NOT NULL,
+    action TEXT NOT NULL,
+    actor TEXT NOT NULL,
+    note TEXT,
+    created_at TEXT NOT NULL
+  );
+`);
+
+const paymentColumns = db.prepare('PRAGMA table_info(payments)').all();
+const hasCancelReasonColumn = paymentColumns.some((column) => column.name === 'cancel_reason');
+const hasCancelledAtColumn = paymentColumns.some((column) => column.name === 'cancelled_at');
+
+if (!hasCancelReasonColumn) {
+  db.exec('ALTER TABLE payments ADD COLUMN cancel_reason TEXT');
+}
+
+if (!hasCancelledAtColumn) {
+  db.exec('ALTER TABLE payments ADD COLUMN cancelled_at TEXT');
+}
 
 export default db;

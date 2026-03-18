@@ -15,7 +15,8 @@ import {
   ArrowLeft,
   Smartphone,
   ReceiptText,
-  Printer
+  Printer,
+  AlertTriangle
 } from 'lucide-react';
 import { getPaymentById, requestPayment } from '../lib/api';
 
@@ -116,6 +117,7 @@ export default function StallPage() {
   const [trackerError, setTrackerError] = useState('');
   const [trackerLoading, setTrackerLoading] = useState(false);
   const [trackedPayment, setTrackedPayment] = useState(null);
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -156,6 +158,7 @@ export default function StallPage() {
   const handleCloseCart = () => {
     setIsCartOpen(false);
     setShowPayConfirm(false);
+    setShowCloseConfirm(false);
 
     setTimeout(() => {
       if (checkoutStep === 'success' || checkoutStep === 'cancelled') {
@@ -265,7 +268,7 @@ export default function StallPage() {
             // Ignore storage failures.
           }
         } else if (payment.status === 'cancelled') {
-          setCancelNote('Payment was not received. Please place a new order or contact the stall admin.');
+          setCancelNote(payment.cancelReason || 'Payment was not received. Please place a new order or contact the stall admin.');
           setCheckoutStep('cancelled');
           try {
             localStorage.removeItem(PENDING_REQUEST_STORAGE_KEY);
@@ -362,7 +365,7 @@ export default function StallPage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
               <IceCream className="text-orange-500 w-6 h-6" />
-              <span className="text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-pink-500">
+              <span className="text-xl font-extrabold bg-clip-text text-transparent bg-linear-to-r from-orange-500 to-pink-500">
                 Drinks N Sweets
               </span>
             </div>
@@ -374,7 +377,7 @@ export default function StallPage() {
               >
                 <ShoppingBag className="w-6 h-6" />
                 {cartItemCount > 0 && (
-                  <span className="absolute top-0 right-0 -mt-1 -mr-1 flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-tr from-pink-500 to-red-500 text-[10px] font-bold text-white shadow-sm">
+                  <span className="absolute top-0 right-0 -mt-1 -mr-1 flex h-5 w-5 items-center justify-center rounded-full bg-linear-to-tr from-pink-500 to-red-500 text-[10px] font-bold text-white shadow-sm">
                     {cartItemCount}
                   </span>
                 )}
@@ -402,7 +405,7 @@ export default function StallPage() {
           </span>
           <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 tracking-tight mb-6">
             Refresh & Recharge <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500">at Our Stall.</span>
+            <span className="bg-clip-text text-transparent bg-linear-to-r from-orange-500 via-pink-500 to-purple-500">at Our Stall.</span>
           </h1>
           <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto mb-10">
             From classic Mojitos to our signature Apricot Delight. Grab a cool drink, snag a sweet combo, and enjoy the farewell party.
@@ -413,7 +416,7 @@ export default function StallPage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div id="invoice-tracker" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-6">
           <h2 className="text-2xl font-black text-gray-900">Track Your Invoice</h2>
           <p className="text-gray-600 mt-1 text-sm">Closed the payment window? Enter your request ID and check invoice status anytime.</p>
@@ -473,7 +476,7 @@ export default function StallPage() {
               )}
               {trackedPayment.status === 'cancelled' && (
                 <p className="mt-1 text-sm text-rose-700 font-medium">
-                  Payment was not received. Please place a new order.
+                  Payment was not received. {trackedPayment.cancelReason ? `Reason: ${trackedPayment.cancelReason}` : 'Please place a new order.'}
                 </p>
               )}
             </div>
@@ -718,7 +721,7 @@ export default function StallPage() {
                         <ArrowLeft className="w-6 h-6" />
                       </button>
                       <h2 className="text-2xl font-bold text-gray-900 flex-1">Awaiting Approval</h2>
-                      <button onClick={handleCloseCart} className="p-2 text-gray-400 hover:bg-gray-100 rounded-full transition-colors">
+                      <button onClick={() => setShowCloseConfirm(true)} className="p-2 text-gray-400 hover:bg-gray-100 rounded-full transition-colors">
                         <X className="w-6 h-6" />
                       </button>
                     </div>
@@ -731,6 +734,26 @@ export default function StallPage() {
                       <p className="text-gray-600 max-w-sm mb-4">Your payment is waiting for admin verification. Invoice will appear here immediately after approval.</p>
                       <p className="text-xs font-bold text-gray-500 bg-gray-100 rounded-full px-3 py-1">Request ID: {currentRequestId}</p>
                     </div>
+
+                    {showCloseConfirm && (
+                      <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm p-6">
+                        <div className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm text-center">
+                          <div className="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <AlertTriangle className="w-7 h-7 text-amber-600" />
+                          </div>
+                          <h3 className="text-xl font-black text-gray-900 mb-2">Wait for Your Invoice!</h3>
+                          <p className="text-gray-600 text-sm mb-6">Your payment is pending admin approval. You'll receive an email invoice once it's confirmed. Closing now might make you miss the invoice.</p>
+                          <div className="flex gap-3">
+                            <button onClick={() => setShowCloseConfirm(false)} className="flex-1 py-3 rounded-full border-2 border-gray-200 text-gray-700 font-bold hover:bg-gray-50 transition-colors">
+                              Keep Waiting
+                            </button>
+                            <button onClick={handleCloseCart} className="flex-1 py-3 rounded-full bg-amber-500 text-white font-bold hover:bg-amber-600 transition-colors shadow-lg">
+                              Close Anyway
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -750,9 +773,23 @@ export default function StallPage() {
                       <h3 className="text-2xl font-black text-gray-900 mb-2">Payment Not Received</h3>
                       <p className="text-gray-600 max-w-sm mb-4">{cancelNote || 'This request was cancelled by admin.'}</p>
                       <p className="text-xs font-bold text-gray-500 bg-gray-100 rounded-full px-3 py-1 mb-5">Request ID: {currentRequestId}</p>
-                      <button onClick={handleCloseCart} className="rounded-full bg-gray-900 px-6 py-3 text-sm font-bold text-white hover:bg-gray-800 transition-colors">
-                        Start New Order
-                      </button>
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <button onClick={handleCloseCart} className="rounded-full bg-gray-900 px-6 py-3 text-sm font-bold text-white hover:bg-gray-800 transition-colors">
+                          Start New Order
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsCartOpen(false);
+                            setCheckoutStep('cart');
+                            setTimeout(() => {
+                              document.getElementById('invoice-tracker')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }, 100);
+                          }}
+                          className="rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors"
+                        >
+                          Go to Invoice Tracker
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}

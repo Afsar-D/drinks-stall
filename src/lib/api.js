@@ -41,8 +41,13 @@ export async function adminLogin(code) {
   return parseResponse(response, 'Invalid admin code');
 }
 
-export async function getAdminPayments(status, code) {
-  const response = await fetch(`${API_BASE_URL}/api/admin/payments?status=${status}`, {
+export async function getAdminPayments(status, code, search = '') {
+  const params = new URLSearchParams({ status });
+  if (search.trim()) {
+    params.set('search', search.trim());
+  }
+
+  const response = await fetch(`${API_BASE_URL}/api/admin/payments?${params.toString()}`, {
     headers: { 'x-admin-code': code }
   });
   return parseResponse(response, `Unable to load ${status} payments`);
@@ -56,10 +61,40 @@ export async function approvePayment(requestId, code) {
   return parseResponse(response, 'Unable to approve payment');
 }
 
-export async function cancelPayment(requestId, code) {
+export async function cancelPayment(requestId, code, reason) {
   const response = await fetch(`${API_BASE_URL}/api/admin/payments/${requestId}/cancel`, {
     method: 'POST',
-    headers: { 'x-admin-code': code }
+    headers: {
+      'x-admin-code': code,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ reason })
   });
   return parseResponse(response, 'Unable to cancel payment');
+}
+
+export async function getAdminSummary(code) {
+  const response = await fetch(`${API_BASE_URL}/api/admin/summary`, {
+    headers: { 'x-admin-code': code }
+  });
+  return parseResponse(response, 'Unable to load summary');
+}
+
+export async function getAdminAuditLogs(code, limit = 50) {
+  const response = await fetch(`${API_BASE_URL}/api/admin/audit?limit=${limit}`, {
+    headers: { 'x-admin-code': code }
+  });
+  return parseResponse(response, 'Unable to load audit logs');
+}
+
+export async function downloadAdminBackupCsv(code) {
+  const response = await fetch(`${API_BASE_URL}/api/admin/export/payments.csv`, {
+    headers: { 'x-admin-code': code }
+  });
+
+  if (!response.ok) {
+    await parseResponse(response, 'Unable to export backup CSV');
+  }
+
+  return response.blob();
 }

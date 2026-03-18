@@ -384,6 +384,13 @@ export default function StallPage() {
               </button>
 
               <Link
+                to="/contact"
+                className="ml-2 px-3 py-2 rounded-full border border-gray-200 text-xs font-bold text-gray-700 hover:bg-gray-100 transition-colors no-print"
+              >
+                Contact
+              </Link>
+
+              <Link
                 to="/admin"
                 className="ml-2 px-3 py-2 rounded-full border border-gray-200 text-xs font-bold text-gray-700 hover:bg-gray-100 transition-colors no-print"
               >

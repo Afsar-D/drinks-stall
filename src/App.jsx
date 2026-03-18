@@ -3,11 +3,20 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import StallPage from './pages/StallPage';
 
 const AdminPage = lazy(() => import('./pages/AdminPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
 
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<StallPage />} />
+      <Route
+        path="/contact"
+        element={(
+          <Suspense fallback={<div className="min-h-screen bg-slate-100 flex items-center justify-center text-slate-600">Loading contact page...</div>}>
+            <ContactPage />
+          </Suspense>
+        )}
+      />
       <Route
         path="/admin"
         element={(

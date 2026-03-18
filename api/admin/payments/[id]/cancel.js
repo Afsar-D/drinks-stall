@@ -11,6 +11,8 @@ export default async function handler(req, res) {
   }
 
   const { id } = req.query;
+  const { reason = '' } = req.body || {};
+
   const { data: row, error: fetchError } = await supabase
     .from('payments')
     .select('*')
@@ -39,6 +41,22 @@ export default async function handler(req, res) {
   if (updateError) {
     console.error(updateError);
     return res.status(500).json({ message: 'Failed to cancel payment' });
+  }
+
+  // Create audit log entry (non-critical; continue if it fails)
+  if (process.env.AUDIT_LOGS_ENABLED !== 'false') {
+    try {
+      const auditId = `AUDIT-${Date.now().toString().slice(-8)}`;
+      await supabase.from('audit_logs').insert({
+        id: auditId,
+        payment_id: id,
+        action: 'cancelled',
+        note: reason ? `Reason: ${reason}` : 'No reason provided'
+      });
+    } catch (auditError) {
+      // Silently fail if audit_logs table doesn't exist yet or on other errors
+      console.error('Audit log creation failed (non-critical):', auditError.message);
+    }
   }
 
   return res.json(toResponseRow(updated));

@@ -52,3 +52,22 @@ END $$;
 -- Disable Row Level Security since all access goes through
 -- Vercel serverless functions using the service role key.
 ALTER TABLE payments DISABLE ROW LEVEL SECURITY;
+
+-- Audit logs table for tracking admin actions
+CREATE TABLE IF NOT EXISTS audit_logs (
+  id             TEXT PRIMARY KEY,
+  payment_id     TEXT NOT NULL,
+  action         TEXT NOT NULL,
+  note           TEXT,
+  created_at     TIMESTAMPTZ DEFAULT now(),
+  FOREIGN KEY (payment_id) REFERENCES payments(id)
+);
+
+-- Index for fast payment ID lookups
+CREATE INDEX IF NOT EXISTS audit_logs_payment_id_idx ON audit_logs (payment_id);
+
+-- Index for fast chronological queries
+CREATE INDEX IF NOT EXISTS audit_logs_created_at_idx ON audit_logs (created_at DESC);
+
+-- Disable Row Level Security for audit_logs
+ALTER TABLE audit_logs DISABLE ROW LEVEL SECURITY;

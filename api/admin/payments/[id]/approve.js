@@ -53,6 +53,22 @@ export default async function handler(req, res) {
     return res.status(500).json({ message: 'Failed to approve payment' });
   }
 
+  // Create audit log entry (non-critical; continue if it fails)
+  if (process.env.AUDIT_LOGS_ENABLED !== 'false') {
+    try {
+      const auditId = `AUDIT-${Date.now().toString().slice(-8)}`;
+      await supabase.from('audit_logs').insert({
+        id: auditId,
+        payment_id: id,
+        action: 'approved',
+        note: `Invoice ID: ${orderId}`
+      });
+    } catch (auditError) {
+      // Silently fail if audit_logs table doesn't exist yet or on other errors
+      console.error('Audit log creation failed (non-critical):', auditError.message);
+    }
+  }
+
   // Send invoice email if customer email exists
   if (updated.customer_email) {
     const items = JSON.parse(updated.items_json);

@@ -228,7 +228,8 @@ export async function sendInvoiceEmail(customerEmail, customerName, orderId, ite
   `;
 
   try {
-    return await sendEmail({
+    // Always use Resend for customer invoices
+    return await sendWithResend({
       to: customerEmail,
       subject: `Invoice ${orderId} - Approved`,
       html: htmlContent,
@@ -294,7 +295,8 @@ export async function sendAdminPaymentRequestNotification({
   `;
 
   try {
-    return await sendEmail({
+    // Always use Brevo for admin notifications
+    return await sendWithBrevo({
       to: adminEmail,
       subject: `New payment request ${requestId}`,
       html: htmlContent,

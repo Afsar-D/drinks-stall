@@ -15,7 +15,7 @@ import {
   Printer,
   AlertTriangle
 } from 'lucide-react';
-import { getPaymentById, requestPayment } from '../lib/api';
+import { getLatestPaymentByCustomer, getPaymentById, requestPayment } from '../lib/api';
 
 const UPI_ID = 'd.afsar@axl';
 const STALL_NAME = 'Liquid Library';
@@ -122,6 +122,8 @@ export default function StallPage() {
   const [cancelNote, setCancelNote] = useState('');
   const [submittedOrder, setSubmittedOrder] = useState(null);
   const [trackerRequestId, setTrackerRequestId] = useState('');
+  const [trackerName, setTrackerName] = useState('');
+  const [trackerEmail, setTrackerEmail] = useState('');
   const [trackerError, setTrackerError] = useState('');
   const [trackerLoading, setTrackerLoading] = useState(false);
   const [trackedPayment, setTrackedPayment] = useState(null);
@@ -336,6 +338,31 @@ export default function StallPage() {
     }
   };
 
+  const handleFindRequestId = async () => {
+    const normalizedName = trackerName.trim();
+    const normalizedEmail = trackerEmail.trim().toLowerCase();
+
+    if (!normalizedName || !normalizedEmail || !emailRegex.test(normalizedEmail)) {
+      setTrackedPayment(null);
+      setTrackerError('Enter the same name and valid email used during checkout.');
+      return;
+    }
+
+    setTrackerLoading(true);
+    setTrackerError('');
+
+    try {
+      const payment = await getLatestPaymentByCustomer(normalizedName, normalizedEmail);
+      setTrackedPayment(payment);
+      setTrackerRequestId(payment.id);
+    } catch {
+      setTrackedPayment(null);
+      setTrackerError('No request found for this name and email.');
+    } finally {
+      setTrackerLoading(false);
+    }
+  };
+
   const handlePrint = () => {
     window.print();
   };
@@ -457,6 +484,40 @@ export default function StallPage() {
             >
               {trackerLoading ? 'Checking...' : 'Track Invoice'}
             </button>
+          </div>
+
+          <div className="mt-5 rounded-2xl border border-gray-200 bg-white p-4">
+            <p className="text-sm font-bold text-gray-900">Forgot Request ID?</p>
+            <p className="text-xs text-gray-600 mt-1">Use the same name and email from checkout to find your latest request.</p>
+            <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <input
+                type="text"
+                value={trackerName}
+                onChange={(event) => {
+                  setTrackerName(event.target.value);
+                  setTrackerError('');
+                }}
+                placeholder="Your name"
+                className="px-4 py-3 rounded-xl border border-gray-200 bg-white shadow-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
+              />
+              <input
+                type="email"
+                value={trackerEmail}
+                onChange={(event) => {
+                  setTrackerEmail(event.target.value);
+                  setTrackerError('');
+                }}
+                placeholder="you@example.com"
+                className="px-4 py-3 rounded-xl border border-gray-200 bg-white shadow-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
+              />
+              <button
+                onClick={handleFindRequestId}
+                disabled={trackerLoading}
+                className="rounded-full bg-orange-500 px-5 py-3 text-sm font-bold text-white hover:bg-orange-600 transition-colors disabled:opacity-60"
+              >
+                {trackerLoading ? 'Finding...' : 'Find Request ID'}
+              </button>
+            </div>
           </div>
 
           {trackerError && <p className="text-red-500 text-xs font-medium mt-3">{trackerError}</p>}

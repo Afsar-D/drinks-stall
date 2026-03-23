@@ -32,6 +32,16 @@ export async function getPaymentById(requestId) {
   return parseResponse(response, 'Unable to fetch payment status');
 }
 
+export async function getLatestPaymentByCustomer(customerName, customerEmail) {
+  const params = new URLSearchParams({
+    name: customerName,
+    email: customerEmail,
+  });
+
+  const response = await fetch(`${API_BASE_URL}/api/payments/find?${params.toString()}`);
+  return parseResponse(response, 'Unable to find payment request');
+}
+
 export async function adminLogin(code) {
   const response = await fetch(`${API_BASE_URL}/api/admin/login`, {
     method: 'POST',

@@ -21,7 +21,7 @@ import {
 import { getPaymentById, requestPayment } from '../lib/api';
 
 const UPI_ID = 'd.afsar@axl';
-const STALL_NAME = 'Drinks N Sweets';
+const STALL_NAME = 'Liquid Library';
 const PENDING_REQUEST_STORAGE_KEY = 'stall_pending_request_id';
 
 const PRODUCTS = [
@@ -366,7 +366,7 @@ export default function StallPage() {
             <div className="flex items-center gap-2">
               <IceCream className="text-orange-500 w-6 h-6" />
               <span className="text-xl font-extrabold bg-clip-text text-transparent bg-linear-to-r from-orange-500 to-pink-500">
-                Drinks N Sweets
+                Liquid Library
               </span>
             </div>
 
@@ -528,7 +528,7 @@ export default function StallPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
             <Sparkles className="text-orange-400 w-6 h-6" />
-            <span className="text-xl font-bold">Drinks N Sweets</span>
+            <span className="text-xl font-bold">Liquid Library</span>
           </div>
           <p className="text-gray-400 text-sm text-center md:text-left">
             Farewell Party Food Stall.<br />
@@ -821,7 +821,7 @@ export default function StallPage() {
                           <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
                             <CheckCircle className="w-6 h-6 text-green-500" />
                           </div>
-                          <h2 className="text-2xl font-black text-gray-900">Drinks N Sweets</h2>
+                          <h2 className="text-2xl font-black text-gray-900">Liquid Library</h2>
                           <p className="text-sm text-gray-500">Farewell Stall Payment Receipt</p>
                         </div>
 

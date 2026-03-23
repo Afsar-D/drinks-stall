@@ -78,7 +78,7 @@ export async function sendInvoiceEmail(customerEmail, customerName, orderId, ite
             <p>If you have any questions, please reply to this email.</p>
           </div>
           <div class="footer">
-            <p>Drinks N Sweets | Farewell Stall</p>
+            <p>Liquid Library | Farewell Stall</p>
             <p>© 2026 All rights reserved</p>
           </div>
         </div>

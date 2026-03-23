@@ -3,9 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   ShoppingBag,
   GlassWater,
-  Droplets,
   IceCream,
-  Gift,
   Sparkles,
   X,
   Plus,
@@ -23,6 +21,7 @@ import { getPaymentById, requestPayment } from '../lib/api';
 const UPI_ID = 'd.afsar@axl';
 const STALL_NAME = 'Liquid Library';
 const PENDING_REQUEST_STORAGE_KEY = 'stall_pending_request_id';
+const PRODUCT_IMAGE_FALLBACK = '/favicon.svg';
 
 const PRODUCTS = [
   {
@@ -31,7 +30,7 @@ const PRODUCTS = [
     price: 39,
     category: 'Drinks',
     description: 'Classic refreshing mint and lime cooler to beat the heat.',
-    icon: <GlassWater className="w-8 h-8 text-green-500" />,
+    image: '/Blue Mojito.jpeg',
     color: 'bg-green-100',
     border: 'border-green-200'
   },
@@ -41,7 +40,7 @@ const PRODUCTS = [
     price: 19,
     category: 'Drinks',
     description: 'Traditional cooling herbal root extract syrup.',
-    icon: <Droplets className="w-8 h-8 text-amber-600" />,
+    image: '/Nannari.jpeg',
     color: 'bg-amber-100',
     border: 'border-amber-200'
   },
@@ -51,7 +50,7 @@ const PRODUCTS = [
     price: 19,
     category: 'Drinks',
     description: 'Balanced thirst-quencher with a hint of fresh lemon.',
-    icon: <GlassWater className="w-8 h-8 text-blue-500" />,
+    image: '/sweetnsalt.jpeg',
     color: 'bg-blue-100',
     border: 'border-blue-200'
   },
@@ -61,9 +60,19 @@ const PRODUCTS = [
     price: 19,
     category: 'Drinks',
     description: 'Sweet, fruity, and vibrant strawberry refreshment.',
-    icon: <GlassWater className="w-8 h-8 text-pink-500" />,
+    image: '/StrawBerry.jpeg',
     color: 'bg-pink-100',
     border: 'border-pink-200'
+  },
+  {
+    id: 7,
+    name: 'Blueberry',
+    price: 19,
+    category: 'Drinks',
+    description: 'Cool and fruity blueberry drink with a smooth sweet finish.',
+    image: '/Blue berry.jpeg',
+    color: 'bg-indigo-100',
+    border: 'border-indigo-200'
   },
   {
     id: 5,
@@ -71,7 +80,7 @@ const PRODUCTS = [
     price: 79,
     category: 'Iced Blended',
     description: 'Our signature thick, creamy, chilled apricot special.',
-    icon: <IceCream className="w-8 h-8 text-orange-500" />,
+    image: '/apricot delight (1).jpeg',
     color: 'bg-orange-100',
     border: 'border-orange-200'
   },
@@ -81,7 +90,7 @@ const PRODUCTS = [
     price: 109,
     category: 'Combos',
     description: 'The ultimate combo. Save big with our best sellers together.',
-    icon: <Gift className="w-8 h-8 text-purple-500" />,
+    image: '/apricot+mojito.png',
     color: 'bg-purple-100',
     border: 'border-purple-200'
   }
@@ -504,7 +513,16 @@ export default function StallPage() {
               <div className={`absolute top-0 right-0 w-32 h-32 ${product.color} rounded-bl-full -z-10 opacity-50 group-hover:scale-110 transition-transform duration-500`}></div>
               <div className="flex justify-between items-start mb-6">
                 <div className={`w-16 h-16 rounded-2xl ${product.color} flex items-center justify-center border ${product.border} shadow-inner`}>
-                  {product.icon}
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full rounded-2xl object-cover"
+                    loading="lazy"
+                    onError={(event) => {
+                      event.currentTarget.onerror = null;
+                      event.currentTarget.src = PRODUCT_IMAGE_FALLBACK;
+                    }}
+                  />
                 </div>
                 <span className="text-xs font-bold uppercase tracking-wider text-gray-500 bg-gray-100 px-3 py-1 rounded-full">{product.category}</span>
               </div>
@@ -573,7 +591,16 @@ export default function StallPage() {
                           {cart.map((item) => (
                             <li key={item.id} className="flex py-2">
                               <div className={`h-20 w-20 shrink-0 overflow-hidden rounded-2xl ${item.color} border ${item.border} flex items-center justify-center`}>
-                                {item.icon}
+                                <img
+                                  src={item.image}
+                                  alt={item.name}
+                                  className="w-full h-full object-cover"
+                                  loading="lazy"
+                                  onError={(event) => {
+                                    event.currentTarget.onerror = null;
+                                    event.currentTarget.src = PRODUCT_IMAGE_FALLBACK;
+                                  }}
+                                />
                               </div>
 
                               <div className="ml-4 flex flex-1 flex-col justify-center">

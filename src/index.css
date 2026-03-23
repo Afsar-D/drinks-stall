@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+@layer base {
+  body {
+    @apply font-sans;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  * {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+}
+
 @theme {
   --animate-blob: blob 7s infinite;
 }

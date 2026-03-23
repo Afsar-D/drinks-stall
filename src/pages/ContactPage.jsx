@@ -5,15 +5,12 @@ import { ArrowLeft, Mail, AlertTriangle, CheckCircle, Phone } from 'lucide-react
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
-    phone: '',
-    message: ''
+    phone: ''
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const phoneRegex = /^[0-9+\-\s()]{7,}$/;
 
   const handleChange = (e) => {
@@ -22,7 +19,6 @@ export default function ContactPage() {
       ...prev,
       [name]: value
     }));
-    // Clear error for this field when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -38,22 +34,10 @@ export default function ContactPage() {
       newErrors.name = 'Name is required';
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!emailRegex.test(formData.email.trim())) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-
     if (!formData.phone.trim()) {
       newErrors.phone = 'Phone number is required';
     } else if (!phoneRegex.test(formData.phone.trim())) {
       newErrors.phone = 'Please enter a valid phone number';
-    }
-
-    if (!formData.message.trim()) {
-      newErrors.message = 'Message is required';
-    } else if (formData.message.trim().length < 10) {
-      newErrors.message = 'Message must be at least 10 characters';
     }
 
     return newErrors;
@@ -78,23 +62,21 @@ export default function ContactPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.name.trim(),
-          email: formData.email.trim(),
-          phone: formData.phone.trim(),
-          message: formData.message.trim()
+          phone: formData.phone.trim()
         })
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to submit message');
+        throw new Error(errorData.message || 'Failed to submit');
       }
 
-      setSubmitStatus({ type: 'success', message: 'Thank you! We\'ve received your message and will get back to you soon.' });
-      setFormData({ name: '', email: '', phone: '', message: '' });
+      setSubmitStatus({ type: 'success', message: 'Thank you! We\'ve received your information.' });
+      setFormData({ name: '', phone: '' });
     } catch (error) {
       setSubmitStatus({
         type: 'error',
-        message: error instanceof Error ? error.message : 'Failed to submit message. Please try again.'
+        message: error instanceof Error ? error.message : 'Failed to submit. Please try again.'
       });
     } finally {
       setIsSubmitting(false);
@@ -189,28 +171,6 @@ export default function ContactPage() {
                 {errors.name && <p className="text-red-600 text-sm mt-1">{errors.name}</p>}
               </div>
 
-              {/* Email Field */}
-              <div>
-                <label htmlFor="email" className="block text-sm font-bold text-slate-900 mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="your@email.com"
-                  className={`w-full px-4 py-3 rounded-lg border-2 transition-colors ${
-                    errors.email
-                      ? 'border-red-300 bg-red-50 focus:outline-none focus:border-red-500'
-                      : 'border-gray-200 bg-gray-50 focus:outline-none focus:border-orange-500'
-                  }`}
-                  disabled={isSubmitting}
-                />
-                {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email}</p>}
-              </div>
-
               {/* Phone Field */}
               <div>
                 <label htmlFor="phone" className="block text-sm font-bold text-slate-900 mb-2">
@@ -231,28 +191,6 @@ export default function ContactPage() {
                   disabled={isSubmitting}
                 />
                 {errors.phone && <p className="text-red-600 text-sm mt-1">{errors.phone}</p>}
-              </div>
-
-              {/* Message Field */}
-              <div>
-                <label htmlFor="message" className="block text-sm font-bold text-slate-900 mb-2">
-                  Message
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  placeholder="Write your message here..."
-                  rows={5}
-                  className={`w-full px-4 py-3 rounded-lg border-2 transition-colors resize-none ${
-                    errors.message
-                      ? 'border-red-300 bg-red-50 focus:outline-none focus:border-red-500'
-                      : 'border-gray-200 bg-gray-50 focus:outline-none focus:border-orange-500'
-                  }`}
-                  disabled={isSubmitting}
-                />
-                {errors.message && <p className="text-red-600 text-sm mt-1">{errors.message}</p>}
               </div>
 
               {/* Status Messages */}
@@ -285,7 +223,7 @@ export default function ContactPage() {
                 disabled={isSubmitting}
                 className="w-full px-6 py-3 bg-linear-to-r from-orange-500 to-pink-500 text-white font-bold rounded-lg hover:shadow-lg transition-shadow disabled:opacity-75 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Sending...' : 'Send Message'}
+                {isSubmitting ? 'Sending...' : 'Submit'}
               </button>
             </form>
           </div>

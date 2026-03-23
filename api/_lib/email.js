@@ -228,8 +228,8 @@ export async function sendInvoiceEmail(customerEmail, customerName, orderId, ite
   `;
 
   try {
-    // Always use Resend for customer invoices
-    return await sendWithResend({
+    // Always use Brevo for customer invoices
+    return await sendWithBrevo({
       to: customerEmail,
       subject: `Invoice ${orderId} - Approved`,
       html: htmlContent,

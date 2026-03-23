@@ -15,6 +15,9 @@ export function toResponseRow(row) {
 
 export function requireAdmin(req) {
   const code = req.headers['x-admin-code'];
-  const adminPasscode = process.env.ADMIN_PASSCODE || '7860';
+  const adminPasscode = process.env.ADMIN_PASSCODE;
+  if (!adminPasscode) {
+    return false;
+  }
   return code === adminPasscode;
 }

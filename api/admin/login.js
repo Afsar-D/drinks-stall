@@ -4,7 +4,11 @@ export default function handler(req, res) {
   }
 
   const { code } = req.body;
-  const adminPasscode = process.env.ADMIN_PASSCODE || '7860';
+  const adminPasscode = process.env.ADMIN_PASSCODE;
+
+  if (!adminPasscode) {
+    return res.status(500).json({ ok: false, message: 'Admin passcode is not configured' });
+  }
 
   if (code === adminPasscode) {
     return res.json({ ok: true });

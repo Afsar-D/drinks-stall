@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const port = process.env.PORT || 4000;
 const host = process.env.HOST || '0.0.0.0';
-const adminPasscode = process.env.ADMIN_PASSCODE || '7860';
+const adminPasscode = process.env.ADMIN_PASSCODE;
 const startedAt = Date.now();
 
 app.use(cors());
@@ -103,6 +103,10 @@ function toResponseRow(row) {
 }
 
 function requireAdmin(req, res, next) {
+  if (!adminPasscode) {
+    return res.status(500).json({ message: 'Admin passcode is not configured' });
+  }
+
   const code = req.header('x-admin-code');
   if (code !== adminPasscode) {
     return res.status(401).json({ message: 'Unauthorized admin request' });
@@ -166,6 +170,10 @@ app.get('/api/payments/:id', (req, res) => {
 
 app.post('/api/admin/login', (req, res) => {
   const { code } = req.body;
+  if (!adminPasscode) {
+    return res.status(500).json({ ok: false, message: 'Admin passcode is not configured' });
+  }
+
   if (code === adminPasscode) {
     return res.json({ ok: true });
   }

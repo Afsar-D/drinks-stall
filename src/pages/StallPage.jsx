@@ -143,10 +143,6 @@ export default function StallPage() {
       }
       return [...prev, { ...product, quantity: 1 }];
     });
-
-    if (cart.length === 0) {
-      setIsCartOpen(true);
-    }
   };
 
   const removeFromCart = (productId) => {
@@ -828,7 +824,8 @@ export default function StallPage() {
                         <ReceiptText className="w-8 h-8 text-amber-600" />
                       </div>
                       <h3 className="text-2xl font-black text-gray-900 mb-2">Payment Request Sent</h3>
-                      <p className="text-gray-600 max-w-sm mb-4">Your payment is waiting for admin verification. Invoice will appear here immediately after approval.</p>
+                      <p className="text-gray-600 max-w-sm mb-3">Your payment is waiting for admin verification. Invoice will appear here immediately after approval.</p>
+                      <p className="text-xs font-semibold text-amber-700 mb-4">Copy and save your Request ID now so you can track your invoice later.</p>
                       <p className="text-xs font-bold text-gray-500 bg-gray-100 rounded-full px-3 py-1">Request ID: {currentRequestId}</p>
                     </div>
 
@@ -839,7 +836,8 @@ export default function StallPage() {
                             <AlertTriangle className="w-7 h-7 text-amber-600" />
                           </div>
                           <h3 className="text-xl font-black text-gray-900 mb-2">Wait for Your Invoice!</h3>
-                          <p className="text-gray-600 text-sm mb-6">Your payment is pending admin approval. You'll receive an email invoice once it's confirmed. Closing now might make you miss the invoice.</p>
+                          <p className="text-gray-600 text-sm mb-3">Your payment is pending admin approval. You'll receive an email invoice once it's confirmed. Closing now might make you miss the invoice.</p>
+                          <p className="text-amber-700 text-xs font-semibold mb-6">Before closing, copy your Request ID so you can check status anytime.</p>
                           <div className="flex gap-3">
                             <button onClick={() => setShowCloseConfirm(false)} className="flex-1 py-3 rounded-full border-2 border-gray-200 text-gray-700 font-bold hover:bg-gray-50 transition-colors">
                               Keep Waiting

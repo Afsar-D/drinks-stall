@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import {
   ShoppingBag,
   GlassWater,
-  IceCream,
   Sparkles,
   X,
   Plus,
@@ -373,7 +372,7 @@ export default function StallPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
-              <IceCream className="text-orange-500 w-6 h-6" />
+              <GlassWater className="text-orange-500 w-6 h-6" />
               <span className="text-xl font-extrabold bg-clip-text text-transparent bg-linear-to-r from-orange-500 to-pink-500">
                 Liquid Library
               </span>
@@ -419,6 +418,9 @@ export default function StallPage() {
           <span className="inline-block py-1 px-3 rounded-full bg-orange-100 text-orange-700 text-sm font-semibold tracking-wide mb-4 border border-orange-200">
             Farewell Party Specials
           </span>
+          <p className="text-3xl md:text-5xl font-black text-orange-500 mb-4" style={{ fontFamily: '"Poppins", sans-serif', letterSpacing: '0.05em' }}>
+            Liquid Library
+          </p>
           <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 tracking-tight mb-6">
             Refresh & Recharge <br />
             <span className="bg-clip-text text-transparent bg-linear-to-r from-orange-500 via-pink-500 to-purple-500">at Our Stall.</span>

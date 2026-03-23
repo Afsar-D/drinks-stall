@@ -1,87 +1,8 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Mail, AlertTriangle, CheckCircle, Phone } from 'lucide-react';
+import { ArrowLeft, Phone } from 'lucide-react';
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: ''
-  });
-  const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null);
-
-  const phoneRegex = /^[0-9+\-\s()]{7,}$/;
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value
-    }));
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    }
-
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
-    } else if (!phoneRegex.test(formData.phone.trim())) {
-      newErrors.phone = 'Please enter a valid phone number';
-    }
-
-    return newErrors;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitStatus(null);
-
-    const newErrors = validateForm();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    setIsSubmitting(true);
-    setErrors({});
-
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.name.trim(),
-          phone: formData.phone.trim()
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to submit');
-      }
-
-      setSubmitStatus({ type: 'success', message: 'Thank you! We\'ve received your information.' });
-      setFormData({ name: '', phone: '' });
-    } catch (error) {
-      setSubmitStatus({
-        type: 'error',
-        message: error instanceof Error ? error.message : 'Failed to submit. Please try again.'
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const CONTACT_NUMBERS = ['8185057629', '7075722377', '9441919465'];
 
   return (
     <div className="min-h-screen bg-linear-to-br from-orange-50 to-pink-50">
@@ -101,131 +22,42 @@ export default function ContactPage() {
         </div>
       </nav>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Contact Information */}
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-3xl font-black text-slate-900 mb-4">Get in Touch</h2>
-              <p className="text-slate-600 leading-relaxed">
-                Have questions about our products or services? We'd love to hear from you. Fill out the form and we'll get back to you as soon as possible.
-              </p>
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-12 text-center">
+          <div className="mb-8">
+            <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Phone className="w-10 h-10 text-orange-600" />
             </div>
+            
+            <h2 className="text-4xl font-black text-slate-900 mb-4">Get in Touch</h2>
+            <p className="text-slate-600 text-lg max-w-2xl mx-auto mb-8">
+              Have questions about our menu, orders, or anything else? Reach out directly!
+            </p>
+          </div>
 
-            <div className="space-y-6">
-              <div className="flex gap-4">
-                <div className="shrink-0">
-                  <Mail className="w-6 h-6 text-orange-500" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 mb-1">Email</h3>
-                  <p className="text-slate-600">Contact Afsar for any questions</p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="shrink-0">
-                  <Phone className="w-6 h-6 text-orange-500" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 mb-1">Phone</h3>
-                  <p className="text-slate-600">
-                    Afsar - <a href="tel:8185057629" className="font-semibold text-orange-700 hover:text-orange-800">8185057629</a>
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-linear-to-br from-orange-100 to-pink-100 rounded-2xl p-6 border border-orange-200">
-                <p className="text-slate-700">
-                  <span className="font-bold">Hours:</span> Available daily for inquiries
-                </p>
-                <p className="text-slate-600 text-sm mt-2">
-                  Contact us anytime and we'll respond at your earliest convenience.
-                </p>
-              </div>
+          <div className="bg-linear-to-r from-orange-50 to-pink-50 rounded-2xl p-12 border border-orange-200 mb-8">
+            <p className="text-slate-600 font-semibold mb-4">Call or Text</p>
+            <div className="flex flex-col gap-4 items-center">
+              {CONTACT_NUMBERS.map((number) => (
+                <a
+                  key={number}
+                  href={`tel:${number}`}
+                  className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-linear-to-r from-orange-500 to-pink-500 text-white rounded-full font-bold text-xl hover:shadow-lg transition-shadow w-full max-w-sm"
+                >
+                  <Phone className="w-6 h-6" />
+                  {number}
+                </a>
+              ))}
             </div>
           </div>
 
-          {/* Contact Form */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Name Field */}
-              <div>
-                <label htmlFor="name" className="block text-sm font-bold text-slate-900 mb-2">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Your name"
-                  className={`w-full px-4 py-3 rounded-lg border-2 transition-colors ${
-                    errors.name
-                      ? 'border-red-300 bg-red-50 focus:outline-none focus:border-red-500'
-                      : 'border-gray-200 bg-gray-50 focus:outline-none focus:border-orange-500'
-                  }`}
-                  disabled={isSubmitting}
-                />
-                {errors.name && <p className="text-red-600 text-sm mt-1">{errors.name}</p>}
-              </div>
-
-              {/* Phone Field */}
-              <div>
-                <label htmlFor="phone" className="block text-sm font-bold text-slate-900 mb-2">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="+91 12345 67890"
-                  className={`w-full px-4 py-3 rounded-lg border-2 transition-colors ${
-                    errors.phone
-                      ? 'border-red-300 bg-red-50 focus:outline-none focus:border-red-500'
-                      : 'border-gray-200 bg-gray-50 focus:outline-none focus:border-orange-500'
-                  }`}
-                  disabled={isSubmitting}
-                />
-                {errors.phone && <p className="text-red-600 text-sm mt-1">{errors.phone}</p>}
-              </div>
-
-              {/* Status Messages */}
-              {submitStatus && (
-                <div
-                  className={`flex gap-3 p-4 rounded-lg ${
-                    submitStatus.type === 'success'
-                      ? 'bg-green-50 border border-green-200'
-                      : 'bg-red-50 border border-red-200'
-                  }`}
-                >
-                  {submitStatus.type === 'success' ? (
-                    <CheckCircle className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
-                  ) : (
-                    <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
-                  )}
-                  <p
-                    className={`text-sm ${
-                      submitStatus.type === 'success' ? 'text-green-700' : 'text-red-700'
-                    }`}
-                  >
-                    {submitStatus.message}
-                  </p>
-                </div>
-              )}
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full px-6 py-3 bg-linear-to-r from-orange-500 to-pink-500 text-white font-bold rounded-lg hover:shadow-lg transition-shadow disabled:opacity-75 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? 'Sending...' : 'Submit'}
-              </button>
-            </form>
+          <div className="space-y-4 text-slate-600">
+            <p className="flex items-center justify-center gap-2">
+              {/* <span className="font-semibold">Afsar</span> - Available daily for inquiries */}
+            </p>
+            <p className="text-sm">
+              Call to place orders, ask questions, or for any special requests
+            </p>
           </div>
         </div>
       </div>

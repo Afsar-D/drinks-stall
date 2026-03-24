@@ -217,6 +217,7 @@ export default function StallPage() {
   const [trackedPayment, setTrackedPayment] = useState(null);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [menuFilter, setMenuFilter] = useState('all');
+  const [copiedField, setCopiedField] = useState('');
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -468,6 +469,16 @@ export default function StallPage() {
   const handleOpenUpiApp = () => {
     const upiUrl = getUpiUrl(cartTotal);
     window.location.href = upiUrl;
+  };
+
+  const handleCopyPaymentValue = async (value, field) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(''), 1500);
+    } catch {
+      // Ignore clipboard permission failures.
+    }
   };
 
   const displayOrder = submittedOrder || {
@@ -862,6 +873,12 @@ export default function StallPage() {
                         Scan with any UPI App <br /> (GPay, PhonePe, Paytm)
                       </p>
 
+                      {cartTotal > 2000 && (
+                        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-5 text-center">
+                          Gallery QR payments may be limited to Rs.2000 in some UPI apps. For higher amounts, scan this QR directly or pay using UPI ID.
+                        </p>
+                      )}
+
                       <div className="w-full space-y-4 mt-auto">
                         <button
                           onClick={handleOpenUpiApp}
@@ -869,6 +886,20 @@ export default function StallPage() {
                           className="w-full flex items-center justify-center gap-2 rounded-full border-2 border-gray-900 bg-white px-6 py-4 text-base font-bold text-gray-900 hover:bg-gray-50 transition-colors md:hidden"
                         >
                           <Smartphone className="w-5 h-5" /> Pay via UPI App
+                        </button>
+                        <button
+                          onClick={() => handleCopyPaymentValue(UPI_ID, 'upi')}
+                          type="button"
+                          className="w-full rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors"
+                        >
+                          {copiedField === 'upi' ? 'UPI ID Copied' : `Copy UPI ID (${UPI_ID})`}
+                        </button>
+                        <button
+                          onClick={() => handleCopyPaymentValue(`${UPI_ID} - Rs.${cartTotal.toFixed(2)}`, 'upi-amount')}
+                          type="button"
+                          className="w-full rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors"
+                        >
+                          {copiedField === 'upi-amount' ? 'UPI ID + Amount Copied' : 'Copy UPI ID + Amount'}
                         </button>
                         <button onClick={() => setShowPayConfirm(true)} className="w-full flex items-center justify-center gap-2 rounded-full bg-green-500 px-6 py-4 text-base font-bold text-white shadow-xl hover:bg-green-600 transition-all active:scale-[0.98]">
                           <CheckCircle className="w-5 h-5" /> I Have Paid

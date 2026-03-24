@@ -1,5 +1,5 @@
 import supabase from '../../../_lib/supabase.js';
-import { toResponseRow, requireAdmin } from '../../../_lib/helpers.js';
+import { toResponseRow, requireAdmin, formatDisplayDateTime } from '../../../_lib/helpers.js';
 import { sendInvoiceEmail } from '../../../_lib/email.js';
 
 export default async function handler(req, res) {
@@ -31,10 +31,7 @@ export default async function handler(req, res) {
   }
 
   const orderId = `INV-${Math.floor(10000 + Math.random() * 90000)}`;
-  const orderDate = new Date().toLocaleString('en-IN', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  });
+  const orderDate = formatDisplayDateTime();
 
   const { data: updated, error: updateError } = await supabase
     .from('payments')

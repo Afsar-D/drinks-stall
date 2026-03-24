@@ -13,6 +13,19 @@ export function toResponseRow(row) {
   };
 }
 
+export function formatDisplayDateTime(value = new Date()) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return '';
+  }
+
+  return date.toLocaleString('en-IN', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'Asia/Kolkata',
+  });
+}
+
 export function requireAdmin(req) {
   const code = req.headers['x-admin-code'];
   const adminPasscode = process.env.ADMIN_PASSCODE;

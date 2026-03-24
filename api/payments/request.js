@@ -1,5 +1,6 @@
 import supabase from '../_lib/supabase.js';
 import { sendAdminPaymentRequestNotification } from '../_lib/email.js';
+import { formatDisplayDateTime } from '../_lib/helpers.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -22,10 +23,7 @@ export default async function handler(req, res) {
   }
 
   const id = `PAY-${Date.now().toString().slice(-6)}`;
-  const createdAt = new Date().toLocaleString('en-IN', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  });
+  const createdAt = formatDisplayDateTime();
 
   const { error } = await supabase.from('payments').insert({
     id,

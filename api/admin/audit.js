@@ -1,5 +1,5 @@
 import supabase from '../_lib/supabase.js';
-import { requireAdmin } from '../_lib/helpers.js';
+import { requireAdmin, formatDisplayDateTime } from '../_lib/helpers.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
       id: log.id,
       paymentId: log.payment_id,
       action: log.action,
-      createdAt: log.created_at ? new Date(log.created_at).toLocaleString('en-IN') : '',
+      createdAt: log.created_at ? formatDisplayDateTime(log.created_at) : '',
       note: log.note
     }));
 

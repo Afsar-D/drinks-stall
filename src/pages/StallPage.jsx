@@ -26,6 +26,7 @@ const PRODUCTS = [
   {
     id: 1,
     name: 'Mojitos',
+    section: 'Drinks',
     price: 39,
     category: 'Drinks',
     description: 'Classic refreshing mint and lime cooler to beat the heat.',
@@ -36,6 +37,7 @@ const PRODUCTS = [
   {
     id: 2,
     name: 'Nannari',
+    section: 'Drinks',
     price: 19,
     category: 'Drinks',
     description: 'Traditional cooling herbal root extract syrup.',
@@ -46,6 +48,7 @@ const PRODUCTS = [
   {
     id: 3,
     name: 'Sweet n salt',
+    section: 'Drinks',
     price: 19,
     category: 'Drinks',
     description: 'Balanced thirst-quencher with a hint of fresh lemon.',
@@ -56,6 +59,7 @@ const PRODUCTS = [
   {
     id: 4,
     name: 'StrawBerry',
+    section: 'Drinks',
     price: 19,
     category: 'Drinks',
     description: 'Sweet, fruity, and vibrant strawberry refreshment.',
@@ -66,6 +70,7 @@ const PRODUCTS = [
   {
     id: 7,
     name: 'Blueberry',
+    section: 'Drinks',
     price: 19,
     category: 'Drinks',
     description: 'Cool and fruity blueberry drink with a smooth sweet finish.',
@@ -74,8 +79,42 @@ const PRODUCTS = [
     border: 'border-indigo-200'
   },
   {
+    id: 8,
+    name: 'Malai - Mango',
+    section: 'Sweets',
+    price: 49,
+    category: 'Malai',
+    description: 'Mango flavour malai, 150 ml cup.',
+    image: '/mango malai.jpg',
+    color: 'bg-yellow-100',
+    border: 'border-yellow-200'
+  },
+  {
+    id: 9,
+    name: 'Malai - Sethaphal',
+    section: 'Sweets',
+    price: 49,
+    category: 'Malai',
+    description: 'Sethaphal flavour malai, 150 ml cup.',
+    image: '/sethaphal.jpeg',
+    color: 'bg-emerald-100',
+    border: 'border-emerald-200'
+  },
+  {
+    id: 10,
+    name: 'Malai - Mulberry',
+    section: 'Sweets',
+    price: 49,
+    category: 'Malai',
+    description: 'Mulberry flavour malai, 150 ml cup.',
+    image: '/mulberry malai.jpeg',
+    color: 'bg-violet-100',
+    border: 'border-violet-200'
+  },
+  {
     id: 5,
     name: 'Apricot Delight',
+    section: 'Sweets',
     price: 79,
     category: 'Iced Blended',
     description: 'Our signature thick, creamy, chilled apricot special.',
@@ -86,6 +125,7 @@ const PRODUCTS = [
   {
     id: 6,
     name: 'Apricot Delight + Mojitos',
+    section: 'Sweets',
     price: 109,
     category: 'Combos',
     description: 'The ultimate combo. Save big with our best sellers together.',
@@ -103,6 +143,54 @@ function toSerializableItems(items) {
     quantity: item.quantity,
     category: item.category
   }));
+}
+
+function MenuSection({ title, products, onAddToCart }) {
+  if (products.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="mt-10 first:mt-0">
+      <h3 className="text-2xl font-black text-gray-900 mb-5">{title}</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {products.map((product) => (
+          <div
+            key={product.id}
+            className="group relative bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col"
+          >
+            <div className={`absolute top-0 right-0 w-32 h-32 ${product.color} rounded-bl-full -z-10 opacity-50 group-hover:scale-110 transition-transform duration-500`}></div>
+            <div className="flex justify-between items-start mb-6">
+              <div className={`w-16 h-16 rounded-2xl ${product.color} flex items-center justify-center border ${product.border} shadow-inner`}>
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-full rounded-2xl object-cover"
+                  loading="lazy"
+                  onError={(event) => {
+                    event.currentTarget.onerror = null;
+                    event.currentTarget.src = PRODUCT_IMAGE_FALLBACK;
+                  }}
+                />
+              </div>
+              <span className="text-xs font-bold uppercase tracking-wider text-gray-500 bg-gray-100 px-3 py-1 rounded-full">{product.category}</span>
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">{product.name}</h3>
+            <p className="text-gray-500 text-sm mb-6 grow">{product.description}</p>
+            <div className="flex items-center justify-between mt-auto">
+              <span className="text-2xl font-black text-gray-900">Rs.{product.price}</span>
+              <button
+                onClick={() => onAddToCart(product)}
+                className="bg-gray-900 text-white px-5 py-2.5 rounded-full font-semibold hover:bg-orange-500 transition-colors active:scale-95 flex items-center gap-2 shadow-md"
+              >
+                <Plus className="w-4 h-4" /> Add
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 export default function StallPage() {
@@ -128,6 +216,7 @@ export default function StallPage() {
   const [trackerLoading, setTrackerLoading] = useState(false);
   const [trackedPayment, setTrackedPayment] = useState(null);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+  const [menuFilter, setMenuFilter] = useState('all');
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -377,6 +466,10 @@ export default function StallPage() {
     items: cart,
     total: cartTotal
   };
+  const drinkProducts = PRODUCTS.filter((product) => product.section === 'Drinks');
+  const sweetProducts = PRODUCTS.filter((product) => product.section === 'Sweets');
+  const showDrinks = menuFilter === 'all' || menuFilter === 'drinks';
+  const showSweets = menuFilter === 'all' || menuFilter === 'sweets';
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans selection:bg-pink-300 selection:text-pink-900">
@@ -560,45 +653,31 @@ export default function StallPage() {
       </div>
 
       <div id="menu" className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-3xl font-bold text-gray-900">Our Menu</h2>
-        <p className="text-gray-500 mt-2 mb-10">Iced, blended, and perfectly sweet.</p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {PRODUCTS.map((product) => (
-            <div
-              key={product.id}
-              className="group relative bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col"
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900">Our Menu</h2>
+            <p className="text-gray-500 mt-2">Iced, blended, and perfectly sweet.</p>
+            <p className="text-xs text-amber-700 mt-2 font-medium">Product may vary from images.</p>
+          </div>
+          <div className="w-full sm:w-64">
+            <label htmlFor="menu-filter" className="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-2">
+              Jump To Section
+            </label>
+            <select
+              id="menu-filter"
+              value={menuFilter}
+              onChange={(event) => setMenuFilter(event.target.value)}
+              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
             >
-              <div className={`absolute top-0 right-0 w-32 h-32 ${product.color} rounded-bl-full -z-10 opacity-50 group-hover:scale-110 transition-transform duration-500`}></div>
-              <div className="flex justify-between items-start mb-6">
-                <div className={`w-16 h-16 rounded-2xl ${product.color} flex items-center justify-center border ${product.border} shadow-inner`}>
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-full rounded-2xl object-cover"
-                    loading="lazy"
-                    onError={(event) => {
-                      event.currentTarget.onerror = null;
-                      event.currentTarget.src = PRODUCT_IMAGE_FALLBACK;
-                    }}
-                  />
-                </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-500 bg-gray-100 px-3 py-1 rounded-full">{product.category}</span>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">{product.name}</h3>
-              <p className="text-gray-500 text-sm mb-6 grow">{product.description}</p>
-              <div className="flex items-center justify-between mt-auto">
-                <span className="text-2xl font-black text-gray-900">Rs.{product.price}</span>
-                <button
-                  onClick={() => addToCart(product)}
-                  className="bg-gray-900 text-white px-5 py-2.5 rounded-full font-semibold hover:bg-orange-500 transition-colors active:scale-95 flex items-center gap-2 shadow-md"
-                >
-                  <Plus className="w-4 h-4" /> Add
-                </button>
-              </div>
-            </div>
-          ))}
+              <option value="all">All</option>
+              <option value="drinks">Drinks</option>
+              <option value="sweets">Sweets</option>
+            </select>
+          </div>
         </div>
+
+        {showDrinks && <MenuSection title="Drinks" products={drinkProducts} onAddToCart={addToCart} />}
+        {showSweets && <MenuSection title="Sweets" products={sweetProducts} onAddToCart={addToCart} />}
       </div>
 
       <footer className="bg-gray-900 text-white py-12 border-t border-gray-800">

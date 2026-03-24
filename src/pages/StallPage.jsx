@@ -453,12 +453,36 @@ export default function StallPage() {
   };
 
   const getUpiUrl = (amount) => {
-    return `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(STALL_NAME)}&am=${amount}&cu=INR`;
+    const params = new URLSearchParams({
+      pa: UPI_ID,
+      pn: STALL_NAME,
+      am: Number(amount).toFixed(2),
+      cu: 'INR',
+      tn: `${STALL_NAME} order`
+    });
+    return `upi://pay?${params.toString()}`;
   };
 
   const getQrUrl = (amount) => {
     const upiString = getUpiUrl(amount);
     return `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiString)}&margin=10`;
+  };
+
+  const handleOpenUpiApp = () => {
+    const upiUrl = getUpiUrl(cartTotal);
+    const isAndroid = /Android/i.test(navigator.userAgent);
+
+    window.location.href = upiUrl;
+
+    if (isAndroid) {
+      // Fallback for Android browsers that block custom scheme redirects.
+      const intentUrl = `intent://pay?${upiUrl.replace('upi://pay?', '')}#Intent;scheme=upi;end`;
+      setTimeout(() => {
+        if (!document.hidden) {
+          window.location.href = intentUrl;
+        }
+      }, 900);
+    }
   };
 
   const displayOrder = submittedOrder || {
@@ -854,9 +878,13 @@ export default function StallPage() {
                       </p>
 
                       <div className="w-full space-y-4 mt-auto">
-                        <a href={getUpiUrl(cartTotal)} className="w-full flex items-center justify-center gap-2 rounded-full border-2 border-gray-900 bg-white px-6 py-4 text-base font-bold text-gray-900 hover:bg-gray-50 transition-colors md:hidden">
+                        <button
+                          onClick={handleOpenUpiApp}
+                          type="button"
+                          className="w-full flex items-center justify-center gap-2 rounded-full border-2 border-gray-900 bg-white px-6 py-4 text-base font-bold text-gray-900 hover:bg-gray-50 transition-colors md:hidden"
+                        >
                           <Smartphone className="w-5 h-5" /> Pay via UPI App
-                        </a>
+                        </button>
                         <button onClick={() => setShowPayConfirm(true)} className="w-full flex items-center justify-center gap-2 rounded-full bg-green-500 px-6 py-4 text-base font-bold text-white shadow-xl hover:bg-green-600 transition-all active:scale-[0.98]">
                           <CheckCircle className="w-5 h-5" /> I Have Paid
                         </button>

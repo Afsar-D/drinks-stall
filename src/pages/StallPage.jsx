@@ -468,7 +468,33 @@ export default function StallPage() {
 
   const handleOpenUpiApp = () => {
     const upiUrl = getUpiUrl(cartTotal);
-    window.location.href = upiUrl;
+    const isAndroid = /Android/i.test(navigator.userAgent);
+
+    // Anchor click works better than location assignment in some mobile browsers.
+    const anchor = document.createElement('a');
+    anchor.href = upiUrl;
+    anchor.style.display = 'none';
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+
+    if (!isAndroid) {
+      return;
+    }
+
+    const intentUrl = `intent://pay?${upiUrl.replace('upi://pay?', '')}#Intent;scheme=upi;end`;
+    const fallbackTimer = window.setTimeout(() => {
+      if (!document.hidden) {
+        window.location.href = intentUrl;
+      }
+    }, 1200);
+
+    const clearFallback = () => {
+      window.clearTimeout(fallbackTimer);
+      document.removeEventListener('visibilitychange', clearFallback);
+    };
+
+    document.addEventListener('visibilitychange', clearFallback);
   };
 
   const handleCopyPaymentValue = async (value, field) => {

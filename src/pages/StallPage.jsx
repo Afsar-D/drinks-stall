@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { getLatestPaymentByCustomer, getPaymentById, requestPayment } from '../lib/api';
 
-const UPI_ID = 'd.afsar@axl';
+const UPI_ID = 'liquidslibrary@nsdl';
 const STALL_NAME = 'Liquid Library';
 const PENDING_REQUEST_STORAGE_KEY = 'stall_pending_request_id';
 const PRODUCT_IMAGE_FALLBACK = '/favicon.svg';
@@ -453,14 +453,11 @@ export default function StallPage() {
   };
 
   const getUpiUrl = (amount) => {
-    const params = new URLSearchParams({
-      pa: UPI_ID,
-      pn: STALL_NAME,
-      am: Number(amount).toFixed(2),
-      cu: 'INR',
-      tn: `${STALL_NAME} order`
-    });
-    return `upi://pay?${params.toString()}`;
+    // Keep the UPI URI minimal because some apps reject extra params as suspicious.
+    const pa = encodeURIComponent(UPI_ID);
+    const pn = encodeURIComponent(STALL_NAME);
+    const am = encodeURIComponent(Number(amount).toFixed(2));
+    return `upi://pay?pa=${pa}&pn=${pn}&am=${am}&cu=INR`;
   };
 
   const getQrUrl = (amount) => {
@@ -470,19 +467,7 @@ export default function StallPage() {
 
   const handleOpenUpiApp = () => {
     const upiUrl = getUpiUrl(cartTotal);
-    const isAndroid = /Android/i.test(navigator.userAgent);
-
     window.location.href = upiUrl;
-
-    if (isAndroid) {
-      // Fallback for Android browsers that block custom scheme redirects.
-      const intentUrl = `intent://pay?${upiUrl.replace('upi://pay?', '')}#Intent;scheme=upi;end`;
-      setTimeout(() => {
-        if (!document.hidden) {
-          window.location.href = intentUrl;
-        }
-      }, 900);
-    }
   };
 
   const displayOrder = submittedOrder || {

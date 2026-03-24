@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { getLatestPaymentByCustomer, getPaymentById, requestPayment } from '../lib/api';
 
-const UPI_ID = 'liquidslibrary@nsdl';
+const UPI_ID = '8185057629@kotak811';
 const STALL_NAME = 'Liquid Library';
 const PENDING_REQUEST_STORAGE_KEY = 'stall_pending_request_id';
 const PRODUCT_IMAGE_FALLBACK = '/favicon.svg';

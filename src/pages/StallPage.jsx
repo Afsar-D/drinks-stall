@@ -82,6 +82,7 @@ const PRODUCTS = [
     id: 8,
     name: 'Malai - Mango',
     section: 'Sweets',
+    originalPrice: 59,
     price: 49,
     category: 'Malai',
     description: 'Mango flavour malai, 150 ml cup.',
@@ -93,6 +94,7 @@ const PRODUCTS = [
     id: 9,
     name: 'Malai - Sethaphal',
     section: 'Sweets',
+    originalPrice: 59,
     price: 49,
     category: 'Malai',
     description: 'Sethaphal flavour malai, 150 ml cup.',
@@ -104,6 +106,7 @@ const PRODUCTS = [
     id: 10,
     name: 'Malai - Mulberry',
     section: 'Sweets',
+    originalPrice: 59,
     price: 49,
     category: 'Malai',
     description: 'Mulberry flavour malai, 150 ml cup.',
@@ -115,6 +118,7 @@ const PRODUCTS = [
     id: 5,
     name: 'Apricot Delight',
     section: 'Sweets',
+    originalPrice: 119,
     price: 79,
     category: 'Iced Blended',
     description: 'Our signature thick, creamy, chilled apricot special.',
@@ -126,7 +130,8 @@ const PRODUCTS = [
     id: 6,
     name: 'Apricot Delight + Mojitos',
     section: 'Sweets',
-    price: 109,
+    originalPrice: 139,
+    price: 119,
     category: 'Combos',
     description: 'The ultimate combo. Save big with our best sellers together.',
     image: '/apricot+mojito.png',
@@ -178,7 +183,12 @@ function MenuSection({ title, products, onAddToCart }) {
             <h3 className="text-xl font-bold text-gray-900 mb-2">{product.name}</h3>
             <p className="text-gray-500 text-sm mb-6 grow">{product.description}</p>
             <div className="flex items-center justify-between mt-auto">
-              <span className="text-2xl font-black text-gray-900">Rs.{product.price}</span>
+              <div className="flex items-end gap-2">
+                {typeof product.originalPrice === 'number' && product.originalPrice > product.price && (
+                  <span className="text-sm font-semibold text-gray-400 line-through">Rs.{product.originalPrice}</span>
+                )}
+                <span className="text-2xl font-black text-gray-900">Rs.{product.price}</span>
+              </div>
               <button
                 onClick={() => onAddToCart(product)}
                 className="bg-gray-900 text-white px-5 py-2.5 rounded-full font-semibold hover:bg-orange-500 transition-colors active:scale-95 flex items-center gap-2 shadow-md"
@@ -589,6 +599,9 @@ export default function StallPage() {
           </h1>
           <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto mb-10">
             From classic Mojitos to our signature Apricot Delight. Grab a cool drink, snag a sweet combo, and enjoy the farewell party.
+          </p>
+          <p className="-mt-4 mb-8 text-sm sm:text-base font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-5 py-2 block w-fit mx-auto">
+            Pre-order your product on website for discount.
           </p>
           <a href="#menu" className="inline-flex px-8 py-4 bg-gray-900 text-white rounded-full font-bold text-lg hover:bg-gray-800 transition-all hover:scale-105 shadow-xl hover:shadow-2xl items-center gap-2">
             View Menu <ArrowRight className="w-5 h-5" />
